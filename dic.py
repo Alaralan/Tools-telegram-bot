@@ -25,10 +25,15 @@ d={
 			'es':"/qr - 🏁 Genera código QR\n"
 		}
 	],
-	'multim':{
-		'en':"🎵 <i>Send me an audio\nwith the song that you whant to know.</i>\n",
-		'es':"🎵 <i>Envíame un audio con la\ncanción que quieras conocer.</i>\n"	
-	},
+	'multim':[
+		{
+			'en':"🎵 <i>Send me an audio\nwith the song that you whant to know.</i>\n",
+			'es':"🎵 <i>Envíame un audio con la\ncanción que quieras conocer.</i>\n"	
+		},{
+			'en':"🖼 <i>Send a photo to remove the background .</i>\n",
+			'es':"🖼 <i>Envía una foto para eliminar el fondo.</i>\n"	
+		}
+	],
 },'qr':{
 	'title':{
 		'en':"🏁 <b>QR</b>\n▬▬▬▬▬▬▬▬▬▬▬▬\n",
@@ -56,8 +61,35 @@ d={
 		'en':"⚫️ Tail",
 		'es':"⚫️ Cruz"
 	},
+},'image':{
+	'start':{
+		'en':"🖼 <i>What you want to do?</i>",
+		'es':"🖼 <i>¿Que quieres hacer?</i>"
+	},'sending':{
+		'en':"<i>Sending...</i>",
+		'es':"<i>Enviando...</i>"
+	},'button':{
+		'delbackground':{
+			'en':"Clean background",
+			'es':"Borrar fondo"
+		},
+		'cancel':{
+			'en':"❌ Cancel",
+			'es':"❌ Cancelar"
+		},
+	},'error':{
+		'400':{
+			'en':"<i>❌ Error: Invalid parameters or input file unprocessable.</i>",
+			'es':"<i>❌ Error: Parámetro válido o fichero no procesable.</i>"
+		},
+		'402':{
+			'en':"<i>❌ Error: Limit reached\nContact the administrator.</i>",
+			'es':"<i>❌ Error: Se ha llegado al límite\nContacte con el administrador.</i>"
+		},
+		'else':{
+			'en':"<i>Some error has occurred.\nTry another photo </i>",
+			'es':"<i>Algún error ha ocurrido.\nPrueba con otra foto</i>"
+		},
+	},
 }
 }
-
-
-#print d['IMC']['TITLE']['es']

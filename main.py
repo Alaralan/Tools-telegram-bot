@@ -11,14 +11,15 @@ help - Lista de comandos
 coin - Tira una moneda al aire
 qr - Genera un código QR
 ───────────────────────────────────────────────────────────────────
-Analiza el audio que se le envíe y te indica la canción
+🎵 Analiza el audio que se le envíe y te indica la canción.
+🖼 Elimina el fondo de una foto enviada.
 ═════════════════════════════════════════════════════════════════════
 ■ DOC
 · https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0#error-handler-callbacks
 '''
 #╔═══════════════════════════════════════════════════════════════════
 #║ ■ IMPORTS
-import sys, os, random, json, subprocess
+import sys, os, random, json, subprocess, requests
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, ForceReply)
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
@@ -50,7 +51,12 @@ if os.path.isfile(FCONF):
 
 	TOKEN=config.get('DEFAULTS', 'token') if CheckConfFile('DEFAULTS','token') else ErrorManager("token")
 	BOTNAME=config.get('DEFAULTS', 'name') if CheckConfFile('DEFAULTS', 'name') else "UNKNOW"
+	
 	TEMP=config.get('PATH', 'temp') if CheckConfFile('PATH', 'temp') else null
+	
+	TOKENSONG=config.get('TOKEN', 'song') if CheckConfFile('TOKEN', 'song') else null
+	TOKENIMG=config.get('TOKEN', 'img') if CheckConfFile('TOKEN', 'img') else null
+	TOKENIMG2=config.get('TOKEN', 'img2') if CheckConfFile('TOKEN', 'img2') else null
 else:
 	sys.exit("No config file found. Remember changing the name of bot-sample.conf to bot.conf")
 #╔═══════════════════════════════════════════════════════════════════
@@ -61,6 +67,16 @@ logger = logging.getLogger(__name__)
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 def error_callback(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
+#▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def button(update, context):
+	query = update.callback_query
+
+	if query.data.split('_',1)[0]=='img':
+		img_bt(update, context)
+	elif query.data.split('_',1)[0]=='0':
+		msg=d['image']['button']['cancel'][lang]
+		context.bot.edit_message_text(msg, query.message.chat_id, query.message.message_id, parse_mode=ParseMode.HTML)
+
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def start(update, context):
 	cid=update.message.chat_id
@@ -73,8 +89,9 @@ def helpC(update, context):
 	msg=d['help']['title'][lang]
 	for i in d['help']['commands']:
 		msg+=i[lang]
-	msg+="▬       ▬       ▬       ▬       ▬\n"
-	msg+=d['help']['multim'][lang]
+	for i in d['help']['multim']:
+		msg+="───────────────\n"
+		msg+=i[lang]
 	
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
@@ -123,7 +140,7 @@ def f_audio(update, context):
 	file_download=context.bot.get_file(update.message.voice.file_id)
 	file_download.download(tempSong)
 
-	process=subprocess.run(['curl','--silent','-F','api_token=test','-F','file=@'+tempSong+'','https://api.audd.io/'], capture_output=True)
+	process=subprocess.run(['curl','--silent','-F','api_token='+TOKENSONG+'','-F','file=@'+tempSong+'','https://api.audd.io/'], capture_output=True)
 	v_song=json.loads(process.stdout)
 	
 	if v_song['result']!=None:
@@ -133,6 +150,68 @@ def f_audio(update, context):
 		msg+=d['song']['notfound'][lang]
 	
 	update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+#▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def img_start(update, context):
+	file_id=update.message.photo[len(update.message.photo)-1].file_id
+	msg=d['image']['start'][lang]
+	keyboard = [[InlineKeyboardButton(d['image']['button']['delbackground'][lang], callback_data='img_background'),
+				 InlineKeyboardButton(d['image']['button']['cancel'][lang], callback_data='0')],
+	]
+	update.message.reply_text(msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard),reply_to_message_id=update.message.message_id)
+def img_bt(update, context):
+	query=			update.callback_query
+	chat_id=		query.message.chat_id
+	message_id=	query.message.message_id
+
+	context.bot.edit_message_text(d['image']['sending'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
+	context.bot.send_chat_action(chat_id, 'typing')
+
+	if query.data.split('_',1)[1]=='background':
+		file_id=query.message.reply_to_message.photo[len(query.message.reply_to_message.photo)-1].file_id
+
+		# Descarga
+		file_photo=context.bot.get_file(file_id)
+		file_photo.download(TEMP+str(chat_id)+'.jpg')
+
+		# Elimina el fondo y lo almacena para enviar
+		status=img_background_rm(TEMP+str(chat_id))
+		if status==200:
+			# Envía
+			photo=open(TEMP+str(chat_id)+'.png', 'rb')
+			context.bot.delete_message(chat_id, message_id)
+			context.bot.send_document(chat_id, photo, reply_to_message_id=message_id-1)
+			# subprocess.run(['rm','-f',TEMP+str(chat_id)+'.png'])
+			# commands.getoutput('rm -f '+TEMP+str(chat_id)+'.png')
+		elif status==400:
+			context.bot.edit_message_text(d['image']['error']['400'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
+		elif status==402:
+			context.bot.edit_message_text(d['image']['error']['402'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
+		else:
+			context.bot.edit_message_text(d['image']['error']['else'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
+		# subprocess.run(['rm','-f',TEMP+str(chat_id)+'.png'])
+		# commands.getoutput('rm -f '+TEMP+str(chat_id)+'.jpg')
+
+#==[ Background Removal ]==
+def img_api(img, token):
+	return requests.post(
+		'https://api.remove.bg/v1.0/removebg',
+		files={'image_file': open(img+'.jpg', 'rb')},
+		data={'size': 'regular'},
+		headers={'X-Api-Key': token},
+	)
+def img_background_rm(img):
+	response=img_api(img, TOKENIMG)
+	if response.status_code==requests.codes.ok:
+		with open(img+'.png', 'wb') as out:
+			out.write(response.content)
+	elif response.status_code!=requests.codes.ok:
+		response=img_api(img, TOKENIMG2)
+		if response.status_code==requests.codes.ok:
+			with open(img+'.png', 'wb') as out:
+				out.write(response.content)
+	return response.status_code
+		# print("Error:", response.status_code, response.text)
+
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
@@ -147,6 +226,7 @@ def main():
 #__________________________________________________________________
 #│ Multimedia
 	dp.add_handler(MessageHandler(Filters.voice , f_audio))
+	dp.add_handler(MessageHandler(Filters.photo, img_start))
 #__________________________________________________________________
 #│ Conversación
 	conv_qr = ConversationHandler(
@@ -160,7 +240,7 @@ def main():
 	dp.add_handler(conv_qr)
 #__________________________________________________________________
 #│ BOTON
-	# dp.add_handler(CallbackQueryHandler(button))
+	dp.add_handler(CallbackQueryHandler(button))
 #════════════════════════════════════════════════════════════════════
 	dp.add_error_handler(error_callback)
 	updater.start_polling()
