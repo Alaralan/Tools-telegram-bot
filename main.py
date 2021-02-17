@@ -10,6 +10,8 @@ Bot que gestion varias herramientas.
 help - Lista de comandos
 coin - Tira una moneda al aire
 qr - Genera un código QR
+───────────────────────────────────────────────────────────────────
+Analiza el audio que se le envíe y te indica la canción
 ═════════════════════════════════════════════════════════════════════
 ■ DOC
 · https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0#error-handler-callbacks
@@ -121,24 +123,9 @@ def f_audio(update, context):
 	file_download=context.bot.get_file(update.message.voice.file_id)
 	file_download.download(tempSong)
 
-	# Get song name
-	# v_song=json.load(requests.post(
-		# 'https://api.audd.io/',
-		# files={'image': tempSong},
-		# headers={'api_token': 'test'},
-	# ))
-	# print(v_song)
-	# v_song=json.loads(commands.getoutput('curl --silent -F "api_token=test" -F "file=@'+tempSong+'" https://api.audd.io/'))
 	process=subprocess.run(['curl','--silent','-F','api_token=test','-F','file=@'+tempSong+'','https://api.audd.io/'], capture_output=True)
 	v_song=json.loads(process.stdout)
 	
-	print("\n\n\n\n")
-	print(v_song)
-	print("\n")
-	print(v_song['result'])
-	print("\n")
-	print(v_song['result']['artist'])
-
 	if v_song['result']!=None:
 		if v_song['status']=='success':
 			msg+='<code>{} - {}</code>'.format(v_song['result']['artist'], v_song['result']['title'])
