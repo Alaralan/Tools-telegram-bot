@@ -3,7 +3,8 @@
 # print d['IMC']['TITLE']['es']
 
 d={
-'ERR':{
+'LANGUAGES':['en','es']
+,'ERR':{
 	'config':{
 		'en':"[{}] Not found. Define it in a file called [bot.conf].",
 		'es':"[{}] No encontrada. Puede definirla en el fichero [bot.conf]."

@@ -29,7 +29,7 @@ from pprint import pprint
 #╔═══════════════════════════════════════════════════════════════════
 #║ ■ DIC
 from dic import d
-lang='es';
+lang='en';
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 def ErrorManager(param):
 	sys.exit(d['error']['config']['es'].format(param))
@@ -68,7 +68,17 @@ logger = logging.getLogger(__name__)
 def error_callback(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def setLang(update):
+	global lang
+	try:
+		lang=update._effective_user.language_code
+		if lang not in d['LANGUAGES']:
+			lang='en'
+	except:
+		lang='en'
+#▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def button(update, context):
+	setLang(update)
 	query = update.callback_query
 
 	if query.data.split('_',1)[0]=='img':
@@ -76,15 +86,16 @@ def button(update, context):
 	elif query.data.split('_',1)[0]=='0':
 		msg=d['image']['button']['cancel'][lang]
 		context.bot.edit_message_text(msg, query.message.chat_id, query.message.message_id, parse_mode=ParseMode.HTML)
-
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def start(update, context):
+	setLang(update)
 	cid=update.message.chat_id
 	msg="<i>Hola.</i>"
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def helpC(update, context):
 	''' HELP '''
+	setLang(update)
 	cid=update.message.chat_id
 	msg=d['help']['title'][lang]
 	for i in d['help']['commands']:
@@ -97,6 +108,7 @@ def helpC(update, context):
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def coin(update, context):
 	''' ⚪️/⚫️ Moneda '''
+	setLang(update)
 	cid=update.message.chat_id
 	v_coin=random.randint(1,2)
 	msg=d['coin']['head'][lang] if v_coin==1 else d['coin']['tail'][lang]
@@ -104,6 +116,7 @@ def coin(update, context):
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def qr(update, context):
 	''' QR '''
+	setLang(update)
 	if update.message.text[4:].strip()=='':
 		msg=d['qr']['title'][lang]
 		msg+=d['qr']['enun'][lang]
@@ -113,6 +126,7 @@ def qr(update, context):
 	else:
 		qr_resul(update, context)
 def qr_resul(update, context):
+	setLang(update)
 	if update.message.text.strip()!='':
 		cid=update.message.chat.id
 		mid=update.message.message_id
@@ -127,11 +141,13 @@ def qr_resul(update, context):
 		context.bot.sendPhoto(cid, imageqr,'🏁 <code>{}</code>'.format(data), parse_mode=ParseMode.HTML)
 		return ConversationHandler.END
 def qr_exit(update, context):
+	setLang(update)
 	# ayuda(update, context)
 	return ConversationHandler.END
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def f_audio(update, context):
 	''' SONG '''
+	setLang(update)
 	msg=d['song']['title'][lang]
 	tempSong=TEMP+"song.ogg"
 	context.bot.send_chat_action(update.message.chat.id, 'typing') # typing...
@@ -152,6 +168,8 @@ def f_audio(update, context):
 	update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def img_start(update, context):
+	''' BACKGROUND REMOVE '''
+	setLang(update)
 	file_id=update.message.photo[len(update.message.photo)-1].file_id
 	msg=d['image']['start'][lang]
 	keyboard = [[InlineKeyboardButton(d['image']['button']['delbackground'][lang], callback_data='img_background'),
@@ -159,6 +177,7 @@ def img_start(update, context):
 	]
 	update.message.reply_text(msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard),reply_to_message_id=update.message.message_id)
 def img_bt(update, context):
+	setLang(update)
 	query=			update.callback_query
 	chat_id=		query.message.chat_id
 	message_id=	query.message.message_id
@@ -180,19 +199,15 @@ def img_bt(update, context):
 			photo=open(TEMP+str(chat_id)+'.png', 'rb')
 			context.bot.delete_message(chat_id, message_id)
 			context.bot.send_document(chat_id, photo, reply_to_message_id=message_id-1)
-			# subprocess.run(['rm','-f',TEMP+str(chat_id)+'.png'])
-			# commands.getoutput('rm -f '+TEMP+str(chat_id)+'.png')
 		elif status==400:
 			context.bot.edit_message_text(d['image']['error']['400'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
 		elif status==402:
 			context.bot.edit_message_text(d['image']['error']['402'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
 		else:
 			context.bot.edit_message_text(d['image']['error']['else'][lang], chat_id, message_id, parse_mode=ParseMode.HTML)
-		# subprocess.run(['rm','-f',TEMP+str(chat_id)+'.png'])
-		# commands.getoutput('rm -f '+TEMP+str(chat_id)+'.jpg')
-
-#==[ Background Removal ]==
+		subprocess.run(['rm','-f',TEMP+str(chat_id)+'.png'])
 def img_api(img, token):
+	'''==[ Background Removal ]=='''
 	return requests.post(
 		'https://api.remove.bg/v1.0/removebg',
 		files={'image_file': open(img+'.jpg', 'rb')},
@@ -210,7 +225,6 @@ def img_background_rm(img):
 			with open(img+'.png', 'wb') as out:
 				out.write(response.content)
 	return response.status_code
-		# print("Error:", response.status_code, response.text)
 
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
