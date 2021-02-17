@@ -16,7 +16,7 @@ qr - Genera un código QR
 '''
 #╔═══════════════════════════════════════════════════════════════════
 #║ ■ IMPORTS
-import sys, os, random
+import sys, os, random, json, subprocess
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, ForceReply)
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
@@ -48,6 +48,7 @@ if os.path.isfile(FCONF):
 
 	TOKEN=config.get('DEFAULTS', 'token') if CheckConfFile('DEFAULTS','token') else ErrorManager("token")
 	BOTNAME=config.get('DEFAULTS', 'name') if CheckConfFile('DEFAULTS', 'name') else "UNKNOW"
+	TEMP=config.get('PATH', 'temp') if CheckConfFile('PATH', 'temp') else null
 else:
 	sys.exit("No config file found. Remember changing the name of bot-sample.conf to bot.conf")
 #╔═══════════════════════════════════════════════════════════════════
@@ -57,8 +58,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 def error_callback(update, context):
-    logger.warning('Update "%s" caused error "%s"', update, context.error)	
-	
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def start(update, context):
 	cid=update.message.chat_id
@@ -71,6 +71,9 @@ def helpC(update, context):
 	msg=d['help']['title'][lang]
 	for i in d['help']['commands']:
 		msg+=i[lang]
+	msg+="▬       ▬       ▬       ▬       ▬\n"
+	msg+=d['help']['multim'][lang]
+	
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def coin(update, context):
@@ -94,7 +97,7 @@ def qr_resul(update, context):
 	if update.message.text.strip()!='':
 		cid=update.message.chat.id
 		mid=update.message.message_id
-		
+
 		if update.message.text[:3]=='/qr':
 			data=update.message.text[4:].strip()
 		else:
@@ -108,19 +111,57 @@ def qr_exit(update, context):
 	# ayuda(update, context)
 	return ConversationHandler.END
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def f_audio(update, context):
+	''' SONG '''
+	msg=d['song']['title'][lang]
+	tempSong=TEMP+"song.ogg"
+	context.bot.send_chat_action(update.message.chat.id, 'typing') # typing...
+
+	# Download in /tmp/song.ogg
+	file_download=context.bot.get_file(update.message.voice.file_id)
+	file_download.download(tempSong)
+
+	# Get song name
+	# v_song=json.load(requests.post(
+		# 'https://api.audd.io/',
+		# files={'image': tempSong},
+		# headers={'api_token': 'test'},
+	# ))
+	# print(v_song)
+	# v_song=json.loads(commands.getoutput('curl --silent -F "api_token=test" -F "file=@'+tempSong+'" https://api.audd.io/'))
+	process=subprocess.run(['curl','--silent','-F','api_token=test','-F','file=@'+tempSong+'','https://api.audd.io/'], capture_output=True)
+	v_song=json.loads(process.stdout)
+	
+	print("\n\n\n\n")
+	print(v_song)
+	print("\n")
+	print(v_song['result'])
+	print("\n")
+	print(v_song['result']['artist'])
+
+	if v_song['result']!=None:
+		if v_song['status']=='success':
+			msg+='<code>{} - {}</code>'.format(v_song['result']['artist'], v_song['result']['title'])
+	else:
+		msg+=d['song']['notfound'][lang]
+	
+	update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+#▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
 def main():
 	updater=Updater(TOKEN, use_context=True)
-#╔═══════════════════════════════════════════════════════════════════
-#║ COMANDOS
 	dp=updater.dispatcher
-	#┌─────────────────────────────────────────────────────────────────
-	#│ •básicos•
+#__________________________________________________________________
+#│ /Comandos_básicos
 	dp.add_handler(CommandHandler('start',	start))
-	dp.add_handler(CommandHandler('help',	helpC))
-	dp.add_handler(CommandHandler('coin',	coin))
-	
+	dp.add_handler(CommandHandler('help',		helpC))
+	dp.add_handler(CommandHandler('coin',		coin))
+#__________________________________________________________________
+#│ Multimedia
+	dp.add_handler(MessageHandler(Filters.voice , f_audio))
+#__________________________________________________________________
+#│ Conversación
 	conv_qr = ConversationHandler(
 		entry_points=[CommandHandler('qr', qr)],
 
@@ -130,8 +171,8 @@ def main():
 		fallbacks=[CommandHandler('cancel', qr_exit, pass_user_data=True)]
 	)
 	dp.add_handler(conv_qr)
-#╔═══════════════════════════════════════════════════════════════════
-#║ BOTON
+#__________________________________________________________________
+#│ BOTON
 	# dp.add_handler(CallbackQueryHandler(button))
 #════════════════════════════════════════════════════════════════════
 	dp.add_error_handler(error_callback)
