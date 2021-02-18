@@ -17,4 +17,7 @@ Para la instalación debemos seguir algunos pasos.
 
 
 # Ejecutar
-python3 main.py
+`python3 main.py`
+
+
+Ya podemos escribirle a nuestro bot.
