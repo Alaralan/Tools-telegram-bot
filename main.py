@@ -52,11 +52,11 @@ if os.path.isfile(FCONF):
 	TOKEN=config.get('DEFAULTS', 'token') if CheckConfFile('DEFAULTS','token') else ErrorManager("token")
 	BOTNAME=config.get('DEFAULTS', 'name') if CheckConfFile('DEFAULTS', 'name') else "UNKNOW"
 	
-	TEMP=config.get('PATH', 'temp') if CheckConfFile('PATH', 'temp') else null
+	TEMP=config.get('PATH', 'temp') if CheckConfFile('PATH', 'temp') else "None"
 	
-	TOKENSONG=config.get('TOKEN', 'song') if CheckConfFile('TOKEN', 'song') else null
-	TOKENIMG=config.get('TOKEN', 'img') if CheckConfFile('TOKEN', 'img') else null
-	TOKENIMG2=config.get('TOKEN', 'img2') if CheckConfFile('TOKEN', 'img2') else null
+	TOKENSONG=config.get('TOKEN', 'song') if CheckConfFile('TOKEN', 'song') else "None"
+	TOKENIMG=config.get('TOKEN', 'img') if CheckConfFile('TOKEN', 'img') else "None"
+	TOKENIMG2=config.get('TOKEN', 'img2') if CheckConfFile('TOKEN', 'img2') else "None"
 else:
 	sys.exit("No config file found. Remember changing the name of bot-sample.conf to bot.conf")
 #╔═══════════════════════════════════════════════════════════════════
@@ -239,8 +239,10 @@ def main():
 	dp.add_handler(CommandHandler('coin',		coin))
 #__________________________________________________________________
 #│ Multimedia
-	dp.add_handler(MessageHandler(Filters.voice , f_audio))
-	dp.add_handler(MessageHandler(Filters.photo, img_start))
+	if TOKENSONG!="None":
+		dp.add_handler(MessageHandler(Filters.photo, img_start))
+	if TOKENIMG!="None":
+		dp.add_handler(MessageHandler(Filters.voice , f_audio))
 #__________________________________________________________________
 #│ Conversación
 	conv_qr = ConversationHandler(
