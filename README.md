@@ -8,10 +8,8 @@ TOKENS necesarios
 
 Para la instalación debemos seguir algunos pasos.
 1. Descargar repositorio
-
 `git clone https://github.com/Alaralan/Tools-telegram-bot.git`
 2. Instalar librerías necesarias
-
 `sudo pip3 install python-telegram-bot`
 3. Configurar los token en el fichero `bot.conf`
 
