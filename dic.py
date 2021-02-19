@@ -9,6 +9,15 @@ d={
 		'en':"[{}] Not found. Define it in a file called [bot.conf].",
 		'es':"[{}] No encontrada. Puede definirla en el fichero [bot.conf]."
 	}
+},'start':{
+	'title':{
+		'en':"📃 <b>Tools_bot</b>\n▬▬▬▬▬▬▬▬▬▬▬▬\n",
+		'es':"📃 <b>Tools_bot</b>\n▬▬▬▬▬▬▬▬▬▬▬▬\n"
+	},
+	'text':{
+		'en':"<i>Welcome\nThen the list of tasks available in the bot will appear.</i>\n",
+		'es':"<i>Bienvenido\nA continuación te envío la lista de comandos disponibles en el bot.</i>\n"	
+	}
 },'help':{
 	'title':{
 		'en':"📃 <b>Command list</b>\n▬▬▬▬▬▬▬▬▬▬▬▬\n",
@@ -29,7 +38,7 @@ d={
 	'multim':[
 		{
 			'en':"🎵 <i>Send me an audio\nwith the song that you whant to know.</i>\n",
-			'es':"🎵 <i>Envíame un audio con la\ncanción que quieras conocer.</i>\n"	
+			'es':"🎵 <i>Envía un audio con la\ncanción que quieras conocer.</i>\n"	
 		},{
 			'en':"🖼 <i>Send a photo to remove the background .</i>\n",
 			'es':"🖼 <i>Envía una foto para eliminar el fondo.</i>\n"	

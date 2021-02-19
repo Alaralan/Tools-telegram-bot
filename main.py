@@ -51,9 +51,9 @@ if os.path.isfile(FCONF):
 
 	TOKEN=config.get('DEFAULTS', 'token') if CheckConfFile('DEFAULTS','token') else ErrorManager("token")
 	BOTNAME=config.get('DEFAULTS', 'name') if CheckConfFile('DEFAULTS', 'name') else "UNKNOW"
-	
+
 	TEMP=config.get('PATH', 'temp') if CheckConfFile('PATH', 'temp') else "None"
-	
+
 	TOKENSONG=config.get('TOKEN', 'song') if CheckConfFile('TOKEN', 'song') else "None"
 	TOKENIMG=config.get('TOKEN', 'img') if CheckConfFile('TOKEN', 'img') else "None"
 	TOKENIMG2=config.get('TOKEN', 'img2') if CheckConfFile('TOKEN', 'img2') else "None"
@@ -90,8 +90,10 @@ def button(update, context):
 def start(update, context):
 	setLang(update)
 	cid=update.message.chat_id
-	msg="<i>Hola.</i>"
+	# msg=d['start']['title'][lang]
+	msg=d['start']['text'][lang]
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
+	helpC(update, context)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def helpC(update, context):
 	''' HELP '''
@@ -103,7 +105,7 @@ def helpC(update, context):
 	for i in d['help']['multim']:
 		msg+="───────────────\n"
 		msg+=i[lang]
-	
+
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def coin(update, context):
@@ -158,13 +160,13 @@ def f_audio(update, context):
 
 	process=subprocess.run(['curl','--silent','-F','api_token='+TOKENSONG+'','-F','file=@'+tempSong+'','https://api.audd.io/'], capture_output=True)
 	v_song=json.loads(process.stdout)
-	
+
 	if v_song['result']!=None:
 		if v_song['status']=='success':
 			msg+='<code>{} - {}</code>'.format(v_song['result']['artist'], v_song['result']['title'])
 	else:
 		msg+=d['song']['notfound'][lang]
-	
+
 	update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def img_start(update, context):
