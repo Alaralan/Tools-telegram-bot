@@ -3,6 +3,8 @@ Base para comenzar nuestro bot en python, usando la librería [python-telegram-b
 
 Implementados en dos idiomas (🇬🇧 🇪🇸)
 
+## Comandos
+------
 # TOKENS
 - Telegram (@BotFather)
 - *Opcional* - Borrar fondo de imagen [remove.bg](https://www.remove.bg/tools-api)
