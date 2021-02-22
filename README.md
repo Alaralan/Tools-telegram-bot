@@ -4,8 +4,8 @@ Base para comenzar nuestro bot en python, usando la librería [python-telegram-b
 Implementados en dos idiomas (🇬🇧 🇪🇸)
 
 ## Comandos
-- **Coin** - Lanza una moneda al aire.
-- **QR** - Genera un código QR de un texto o URL introducido.
+- `Coin` - Lanza una moneda al aire.
+- `QR` - Genera un código QR de un texto o URL introducido.
 - **Adivina la canción** - Descubre la canción del audio que se le envíe.
 - **Borrar fondo** - Elimina el fondo de pantalla de una foto.
 ------
