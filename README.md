@@ -14,6 +14,8 @@ Implementados en dos idiomas (🇬🇧 🇪🇸)
 - *Opcional* - Borrar fondo de imagen [remove.bg](https://www.remove.bg/tools-api)
 - *Opcional* - Reconocer la canción [Audd.io](https://dashboard.audd.io/)
 
+*Estos últimos son opcionales, si no se introduce el token no funcionarán esa opciones, pero si el resto del bot*
+
 # Instalación
 Para la instalación debemos seguir algunos pasos.
 1. Descargar repositorio
