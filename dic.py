@@ -1,4 +1,4 @@
-# lang=	update._effective_user.language_code
+﻿# lang=	update._effective_user.language_code
 # d['qr'][0][lang]
 # print d['IMC']['TITLE']['es']
 
