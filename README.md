@@ -10,7 +10,7 @@ Implementados en dos idiomas (🇬🇧 🇪🇸)
 - **Borrar fondo** - Elimina el fondo de pantalla de una foto.
 ------
 # TOKENS
-- Telegram (@BotFather)
+- Telegram ([@BotFather](t.me/BotFather))
 - *Opcional* - Borrar fondo de imagen [remove.bg](https://www.remove.bg/tools-api)
 - *Opcional* - Reconocer la canción [Audd.io](https://dashboard.audd.io/)
 
