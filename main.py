@@ -263,6 +263,7 @@ def you2mp3(update, context):
 		song_file=open(song_title+'.mp3', 'rb')
 		context.bot.delete_message(cid, mid+1)
 		context.bot.send_document(cid, song_file)
+		os.remove(song_title+'.mp3')
 	except Exception:
 		context.bot.delete_message(cid, mid+1)
 		msg=d['youtube']['err'][lang]
