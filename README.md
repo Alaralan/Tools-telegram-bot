@@ -4,15 +4,17 @@ Base para comenzar nuestro bot en python, usando la librería [python-telegram-b
 Implementados en dos idiomas (🇬🇧 🇪🇸)
 
 ## Comandos
-- **Coin** - Lanza una moneda al aire.
-- **QR** - Genera un código QR de un texto o URL introducido.
+- `Coin` - Lanza una moneda al aire.
+- `QR` - Genera un código QR de un texto o URL introducido.
 - **Adivina la canción** - Descubre la canción del audio que se le envíe.
 - **Borrar fondo** - Elimina el fondo de pantalla de una foto.
 ------
 # TOKENS
-- Telegram (@BotFather)
+- Telegram ([@BotFather](t.me/BotFather))
 - *Opcional* - Borrar fondo de imagen [remove.bg](https://www.remove.bg/tools-api)
 - *Opcional* - Reconocer la canción [Audd.io](https://dashboard.audd.io/)
+
+*Estos últimos son opcionales, si no se introduce el token no funcionarán esa opciones, pero si el resto del bot*
 
 # Instalación
 Para la instalación debemos seguir algunos pasos.
