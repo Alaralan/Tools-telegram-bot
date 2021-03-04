@@ -24,6 +24,9 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, For
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+""" Download MP3 from youtube"""
+import youtube_dl
+#▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 from pprint import pprint
 # pprint(update.to_dict())
 #╔═══════════════════════════════════════════════════════════════════
@@ -227,7 +230,43 @@ def img_background_rm(img):
 			with open(img+'.png', 'wb') as out:
 				out.write(response.content)
 	return response.status_code
+#▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def you2mp3(update, context):
+	url=update.message.text;
+	cid=update.message.chat.id
+	mid=update.message.message_id
 
+	context.bot.send_chat_action(update.message.chat.id, 'typing') # Enviando ...
+	msg=d['youtube']['send'][lang]
+	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
+	
+	# Get name
+	song_title=youtube_dl.YoutubeDL().extract_info(url, download=False)['title']
+	outtmpl=song_title + '.%(ext)s'
+	# Download
+	ydl_opts={
+		'format': 'bestaudio/best',
+		'outtmpl': outtmpl,
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			'preferredquality': '192',
+		},
+		{'key': 'FFmpegMetadata'},
+		],
+		'noplaylist' : True,
+		# 'progress_hooks': [my_hook],
+	}
+	try:
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			ydl.download([url])
+		song_file=open(song_title+'.mp3', 'rb')
+		context.bot.delete_message(cid, mid+1)
+		context.bot.send_document(cid, song_file)
+	except Exception:
+		context.bot.delete_message(cid, mid+1)
+		msg=d['youtube']['err'][lang]
+		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
@@ -239,6 +278,9 @@ def main():
 	dp.add_handler(CommandHandler('start',	start))
 	dp.add_handler(CommandHandler('help',		helpC))
 	dp.add_handler(CommandHandler('coin',		coin))
+	
+	# ((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+
+	dp.add_handler(MessageHandler(Filters.regex(r"((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+"), you2mp3))
 #__________________________________________________________________
 #│ Multimedia
 	if TOKENSONG!="None":

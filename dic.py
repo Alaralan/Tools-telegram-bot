@@ -71,6 +71,15 @@ d={
 		'en':"⚫️ Tail",
 		'es':"⚫️ Cruz"
 	},
+},'youtube':{
+	'err':{
+		'en':"Error",
+		'es':"Error"
+	},
+	'send':{
+		'en':"🔜 Sending...",
+		'es':"🔜 Enviando..."
+	},
 },'image':{
 	'start':{
 		'en':"🖼 <i>What you want to do?</i>",
