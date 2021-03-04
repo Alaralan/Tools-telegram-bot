@@ -232,11 +232,18 @@ def img_background_rm(img):
 	return response.status_code
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def you2mp3(update, context):
-	url=update.message.text;
-	cid=update.message.chat.id
-	mid=update.message.message_id
+	setLang(update)
 
-	context.bot.send_chat_action(update.message.chat.id, 'typing') # Enviando ...
+	if update.message!=None and update.message.chat.type=='private':
+		url=update.message.text;
+		cid=update.message.chat.id
+		mid=update.message.message_id
+	elif update.channel_post.sender_chat.type=='channel':
+		url=update.channel_post.text;
+		cid=update.channel_post.sender_chat.id
+		mid=update.channel_post.message_id
+
+	context.bot.send_chat_action(cid, 'typing') # Enviando ...
 	msg=d['youtube']['send'][lang]
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 	
@@ -261,9 +268,13 @@ def you2mp3(update, context):
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			ydl.download([url])
 		song_file=open(song_title+'.mp3', 'rb')
-		context.bot.delete_message(cid, mid+1)
 		context.bot.send_document(cid, song_file)
 		os.remove(song_title+'.mp3')
+		try:
+			context.bot.delete_message(cid, mid)
+		except:
+			pass
+		context.bot.delete_message(cid, mid+1)
 	except Exception:
 		context.bot.delete_message(cid, mid+1)
 		msg=d['youtube']['err'][lang]
