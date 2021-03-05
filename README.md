@@ -1,5 +1,6 @@
 # Tools-telegram-bot
 Base para comenzar nuestro bot en python, usando la librería [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
+Opcional, para descargar videos de youtube [Youtube-DL](http://ytdl-org.github.io/youtube-dl/download.html)
 
 Implementados en dos idiomas (🇬🇧 🇪🇸)
 
@@ -8,6 +9,7 @@ Implementados en dos idiomas (🇬🇧 🇪🇸)
 - `QR` - Genera un código QR de un texto o URL introducido.
 - **Adivina la canción** - Descubre la canción del audio que se le envíe.
 - **Borrar fondo** - Elimina el fondo de pantalla de una foto.
+- **Youtube** - Descarga el audio en MP3 de un enlace de Youtube
 ------
 # TOKENS
 - Telegram ([@BotFather](t.me/BotFather))
