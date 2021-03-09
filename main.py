@@ -12,6 +12,7 @@ coin - Tira una moneda al aire
 qr - Genera un código QR
 ───────────────────────────────────────────────────────────────────
 🎵 Analiza el audio que se le envíe y te indica la canción.
+🎵 Descarga MP3 desde un video de Youtube.
 🖼 Elimina el fondo de una foto enviada.
 ═════════════════════════════════════════════════════════════════════
 ■ DOC
@@ -234,6 +235,7 @@ def img_background_rm(img):
 	return response.status_code
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def you2mp3(update, context):
+	''' YOUTUBE TO MP3 '''
 	setLang(update)
 
 	if update.message!=None and update.message.chat.type=='private':
@@ -266,23 +268,29 @@ def you2mp3(update, context):
 		],
 		# 'progress_hooks': [my_hook],
 	}
-	try:
-		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			song_title=ydl.extract_info(url,download=False)['title']
-			ydl.download([url])
-		song_file=open(song_title.replace('"',"'")+".mp3", 'rb')
-		context.bot.send_document(cid, song_file)
-		os.remove(song_title+".mp3")
-		try:
+	# try:
+	
+	
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		# info_dict=ydl.extract_info(url,download=False)['title'].replace('"',"'")
+		info_dict=ydl.extract_info(url,download=False)
+		print(info_dict['ext'])
+		# pprint(info_dict)
+		song_title=ydl.prepare_filename(info_dict).replace(info_dict['ext'],'mp3')
+		ydl.download([url])
+	song_file=open(song_title, 'rb')
+	context.bot.send_document(cid, song_file)
+	os.remove(song_title)
+			
+			
+		# try:
 			# Evita el error si el bot no tiene permisos para borrar.
-			context.bot.delete_message(cid, mid)
-		except:
-			pass
-		# context.bot.delete_message(cid, mid+1)
-	except Exception:
-		# context.bot.delete_message(cid, mid+1)
-		msg=d['youtube']['err'][lang]
-		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+			# context.bot.delete_message(cid, mid)
+		# except:
+				# pass
+	# except Exception:
+		# msg=d['youtube']['err'][lang]
+		# update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
