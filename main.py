@@ -88,7 +88,10 @@ def button(update, context):
 	if query.data.split('_',1)[0]=='img':
 		img_bt(update, context)
 	elif query.data.split('_',1)[0]=='delete':
-		context.bot.delete_message(query.message.chat_id, query.message.message_id)
+		try:
+			context.bot.delete_message(query.message.chat_id, query.message.message_id)
+		except:
+			pass
 	elif query.data.split('_',1)[0]=='0':
 		msg=d['image']['button']['cancel'][lang]
 		context.bot.edit_message_text(msg, query.message.chat_id, query.message.message_id, parse_mode=ParseMode.HTML)
@@ -236,6 +239,7 @@ def img_background_rm(img):
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def you2mp3(update, context):
 	''' YOUTUBE TO MP3 '''
+	pprint(update.to_dict())
 	setLang(update)
 
 	if update.message!=None and update.message.chat.type=='private':
@@ -268,29 +272,22 @@ def you2mp3(update, context):
 		],
 		# 'progress_hooks': [my_hook],
 	}
-	# try:
-	
-	
-	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-		# info_dict=ydl.extract_info(url,download=False)['title'].replace('"',"'")
-		info_dict=ydl.extract_info(url,download=False)
-		print(info_dict['ext'])
-		# pprint(info_dict)
-		song_title=ydl.prepare_filename(info_dict).replace(info_dict['ext'],'mp3')
-		ydl.download([url])
-	song_file=open(song_title, 'rb')
-	context.bot.send_document(cid, song_file)
-	os.remove(song_title)
-			
-			
-		# try:
+	try:
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			info_dict=ydl.extract_info(url,download=False)
+			song_title=ydl.prepare_filename(info_dict).replace(info_dict['ext'],'mp3')
+			ydl.download([url])
+		song_file=open(song_title, 'rb')
+		context.bot.send_document(cid, song_file)
+		os.remove(song_title)
+		try:
 			# Evita el error si el bot no tiene permisos para borrar.
-			# context.bot.delete_message(cid, mid)
-		# except:
-				# pass
-	# except Exception:
-		# msg=d['youtube']['err'][lang]
-		# update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+			context.bot.delete_message(cid, mid)
+		except:
+				pass
+	except Exception:
+		msg=d['youtube']['err'][lang]
+		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
