@@ -82,10 +82,12 @@ def setLang(update):
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def button(update, context):
 	setLang(update)
-	query = update.callback_query
+	query=update.callback_query
 
 	if query.data.split('_',1)[0]=='img':
 		img_bt(update, context)
+	elif query.data.split('_',1)[0]=='delete':
+		context.bot.delete_message(query.message.chat_id, query.message.message_id)
 	elif query.data.split('_',1)[0]=='0':
 		msg=d['image']['button']['cancel'][lang]
 		context.bot.edit_message_text(msg, query.message.chat_id, query.message.message_id, parse_mode=ParseMode.HTML)
@@ -245,7 +247,9 @@ def you2mp3(update, context):
 
 	context.bot.send_chat_action(cid, 'typing') # Enviando ...
 	msg=d['youtube']['send'][lang]
-	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
+	
+	keyboard=[[InlineKeyboardButton("❌", callback_data='delete')],]
+	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
 	
 	# Download
 	ydl_opts={
@@ -266,17 +270,17 @@ def you2mp3(update, context):
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 			song_title=ydl.extract_info(url,download=False)['title']
 			ydl.download([url])
-		song_file=open(song_title+'.mp3', 'rb')
+		song_file=open(song_title.replace('"',"'")+".mp3", 'rb')
 		context.bot.send_document(cid, song_file)
-		os.remove(song_title+'.mp3')
+		os.remove(song_title+".mp3")
 		try:
 			# Evita el error si el bot no tiene permisos para borrar.
 			context.bot.delete_message(cid, mid)
 		except:
 			pass
-		context.bot.delete_message(cid, mid+1)
+		# context.bot.delete_message(cid, mid+1)
 	except Exception:
-		context.bot.delete_message(cid, mid+1)
+		# context.bot.delete_message(cid, mid+1)
 		msg=d['youtube']['err'][lang]
 		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
