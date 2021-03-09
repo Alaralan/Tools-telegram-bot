@@ -1,6 +1,6 @@
 # Tools-telegram-bot
 Base para comenzar nuestro bot en python, usando la librería [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
-Opcional, para descargar videos de youtube [Youtube-DL](http://ytdl-org.github.io/youtube-dl/download.html)
+Opcional, para descargar videos de youtube [Youtube-DL](https://github.com/ytdl-org/youtube-dl)
 
 Implementados en dos idiomas (🇬🇧 🇪🇸)
 
