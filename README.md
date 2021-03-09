@@ -2,7 +2,7 @@
 Base para comenzar nuestro bot en python, usando la librería [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
 Opcional, para descargar videos de youtube [Youtube-DL](https://github.com/ytdl-org/youtube-dl)
 
-Implementados en dos idiomas (🇬🇧 🇪🇸)
+Implementados en dos idiomas (English - Castellano)
 
 ## Comandos
 - `Coin` - Lanza una moneda al aire.
