@@ -247,13 +247,12 @@ def you2mp3(update, context):
 	msg=d['youtube']['send'][lang]
 	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML)
 	
-	# Get name
-	song_title=youtube_dl.YoutubeDL().extract_info(url, download=False)['title']
-	outtmpl=song_title + '.%(ext)s'
 	# Download
 	ydl_opts={
 		'format': 'bestaudio/best',
-		'outtmpl': outtmpl,
+		'outtmpl': '%(title)s.%(ext)s',
+		'noplaylist' : True,
+		'continue_dl' : True,
 		'postprocessors': [{
 			'key': 'FFmpegExtractAudio',
 			'preferredcodec': 'mp3',
@@ -261,16 +260,17 @@ def you2mp3(update, context):
 		},
 		{'key': 'FFmpegMetadata'},
 		],
-		'noplaylist' : True,
 		# 'progress_hooks': [my_hook],
 	}
 	try:
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			song_title=ydl.extract_info(url,download=False)['title']
 			ydl.download([url])
 		song_file=open(song_title+'.mp3', 'rb')
 		context.bot.send_document(cid, song_file)
 		os.remove(song_title+'.mp3')
 		try:
+			# Evita el error si el bot no tiene permisos para borrar.
 			context.bot.delete_message(cid, mid)
 		except:
 			pass
@@ -291,7 +291,6 @@ def main():
 	dp.add_handler(CommandHandler('help',		helpC))
 	dp.add_handler(CommandHandler('coin',		coin))
 	
-	# ((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+
 	dp.add_handler(MessageHandler(Filters.regex(r"((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+"), you2mp3))
 #__________________________________________________________________
 #│ Multimedia
