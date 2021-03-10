@@ -20,7 +20,7 @@ qr - Genera un código QR
 '''
 #╔═══════════════════════════════════════════════════════════════════
 #║ ■ IMPORTS
-import sys, os, random, json, subprocess, requests
+import sys, os, random, json, subprocess, requests, threading
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, ForceReply)
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
@@ -237,26 +237,7 @@ def img_background_rm(img):
 				out.write(response.content)
 	return response.status_code
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-def you2mp3(update, context):
-	''' YOUTUBE TO MP3 '''
-	pprint(update.to_dict())
-	setLang(update)
-
-	if update.message!=None and update.message.chat.type=='private':
-		url=update.message.text;
-		cid=update.message.chat.id
-		mid=update.message.message_id
-	elif update.channel_post.sender_chat.type=='channel':
-		url=update.channel_post.text;
-		cid=update.channel_post.sender_chat.id
-		mid=update.channel_post.message_id
-
-	context.bot.send_chat_action(cid, 'typing') # Enviando ...
-	msg=d['youtube']['send'][lang]
-	
-	keyboard=[[InlineKeyboardButton("❌", callback_data='delete')],]
-	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
-	
+def you2mp3Thread(update,context,url,cid,mid):
 	# Download
 	ydl_opts={
 		'format': 'bestaudio/best',
@@ -288,6 +269,27 @@ def you2mp3(update, context):
 	except Exception:
 		msg=d['youtube']['err'][lang]
 		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+def you2mp3(update, context):
+	''' YOUTUBE TO MP3 '''
+	setLang(update)
+
+	if update.message!=None and update.message.chat.type=='private':
+		url=update.message.text;
+		cid=update.message.chat.id
+		mid=update.message.message_id
+	elif update.channel_post.sender_chat.type=='channel':
+		url=update.channel_post.text;
+		cid=update.channel_post.sender_chat.id
+		mid=update.channel_post.message_id
+
+	context.bot.send_chat_action(cid, 'typing') # Enviando ...
+	msg=d['youtube']['send'][lang]
+	
+	keyboard=[[InlineKeyboardButton("❌", callback_data='delete')],]
+	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
+	
+	t=threading.Thread(target=you2mp3Thread,args=(update,context,url,cid,mid))
+	t.start()
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
 CHOOSING, ADDING0, ADDING1 = list(range(3))
