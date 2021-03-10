@@ -20,7 +20,7 @@ qr - Genera un código QR
 '''
 #╔═══════════════════════════════════════════════════════════════════
 #║ ■ IMPORTS
-import sys, os, random, json, subprocess, requests, threading
+import sys, os, random, json, subprocess, requests, threading, time
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, ForceReply)
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
@@ -237,7 +237,8 @@ def img_background_rm(img):
 				out.write(response.content)
 	return response.status_code
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-def you2mp3Thread(update,context,url,cid,mid):
+def you2mp3Thread(update,context,url,cid,mid,s):
+	''' Threading downloads'''
 	# Download
 	ydl_opts={
 		'format': 'bestaudio/best',
@@ -269,6 +270,14 @@ def you2mp3Thread(update,context,url,cid,mid):
 	except Exception:
 		msg=d['youtube']['err'][lang]
 		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+
+	global sendingStop
+	sendingStop=False
+	s.join()
+def Sending(context, cid):
+	while(sendingStop):
+		context.bot.send_chat_action(cid, 'upload_audio') # Enviando ...
+		time.sleep(3)
 def you2mp3(update, context):
 	''' YOUTUBE TO MP3 '''
 	setLang(update)
@@ -282,13 +291,12 @@ def you2mp3(update, context):
 		cid=update.channel_post.sender_chat.id
 		mid=update.channel_post.message_id
 
-	context.bot.send_chat_action(cid, 'typing') # Enviando ...
-	msg=d['youtube']['send'][lang]
-	
-	keyboard=[[InlineKeyboardButton("❌", callback_data='delete')],]
-	context.bot.send_message(cid, msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
-	
-	t=threading.Thread(target=you2mp3Thread,args=(update,context,url,cid,mid))
+	global sendingStop
+	sendingStop=True
+	s=threading.Thread(target=Sending,args=(context,cid))
+	s.start()
+
+	t=threading.Thread(target=you2mp3Thread,args=(update,context,url,cid,mid,s))
 	t.start()
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 #█ ■ main
@@ -301,7 +309,7 @@ def main():
 	dp.add_handler(CommandHandler('start',	start))
 	dp.add_handler(CommandHandler('help',		helpC))
 	dp.add_handler(CommandHandler('coin',		coin))
-	
+
 	dp.add_handler(MessageHandler(Filters.regex(r"((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+"), you2mp3))
 #__________________________________________________________________
 #│ Multimedia
