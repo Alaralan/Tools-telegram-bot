@@ -75,10 +75,12 @@ d={
 	'err':{
 		'en':"Error",
 		'es':"Error"
-	},
-	'send':{
+	},'send':{
 		'en':"🔜 Sending...",
 		'es':"🔜 Enviando..."
+	},'button':{
+		'en':"📥 Download",
+		'es':"📥 Descargar"
 	},
 },'image':{
 	'start':{

@@ -25,12 +25,18 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, For
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-""" Download MP3 from youtube"""
+''' Download MP3 from youtube'''
 try: 
 	import youtube_dl
 	youtube_dl_ok=True
 except ImportError:
 	youtube_dl_ok=False
+''' Youtube Search '''	
+try: 
+	from youtube_search import YoutubeSearch
+	youtubeSearchOk=True
+except ImportError:
+	youtubeSearchOk=False
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 from pprint import pprint
 # pprint(update.to_dict())
@@ -91,6 +97,8 @@ def button(update, context):
 
 	if query.data.split('_',1)[0]=='img':
 		img_bt(update, context)
+	elif query.data.split('_',1)[0]=='you':
+		you2button(update,context)
 	elif query.data.split('_',1)[0]=='delete':
 		try:
 			context.bot.delete_message(query.message.chat_id, query.message.message_id)
@@ -177,10 +185,18 @@ def f_audio(update, context):
 	if v_song['result']!=None:
 		if v_song['status']=='success':
 			msg+='<code>{} - {}</code>'.format(v_song['result']['artist'], v_song['result']['title'])
+			if youtubeSearchOk:
+				keyboard=[
+					[
+					InlineKeyboardButton(d['youtube']['button'][lang],callback_data='you_1'),
+					],
+				]
+				update.message.reply_text(msg, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
+			else:
+				update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 	else:
 		msg+=d['song']['notfound'][lang]
-
-	update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+		update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 def img_start(update, context):
 	''' BACKGROUND REMOVE '''
@@ -245,6 +261,25 @@ def Sending(context, cid):
 	while(sendingStop):
 		context.bot.send_chat_action(cid, 'upload_audio') # Enviando ...
 		time.sleep(3)
+def you2button(update,context):
+	query=update.callback_query
+	pprint(query.to_dict())
+	
+	cid=query.message.chat.id
+	mid=query.message.message_id
+	
+	songName=query.message.text.split('\n')[2]
+	results=YoutubeSearch(songName, max_results=1).to_dict()
+	pprint(results[0]['id'])
+	# returns a dictionary
+	url="https://www.youtube.com/watch?v="+results[0]['id']
+	
+	global sendingStop
+	sendingStop=True
+	s=threading.Thread(target=Sending,args=(context,cid))
+	s.start()
+	
+	you2mp3Thread(update,context,url,cid,mid,s)
 def you2mp3Thread(update,context,url,cid,mid,s):
 	''' Threading downloads'''
 	# Download
