@@ -263,15 +263,12 @@ def Sending(context, cid):
 		time.sleep(3)
 def you2button(update,context):
 	query=update.callback_query
-	pprint(query.to_dict())
 	
 	cid=query.message.chat.id
 	mid=query.message.message_id
 	
 	songName=query.message.text.split('\n')[2]
 	results=YoutubeSearch(songName, max_results=1).to_dict()
-	pprint(results[0]['id'])
-	# returns a dictionary
 	url="https://www.youtube.com/watch?v="+results[0]['id']
 	
 	global sendingStop
