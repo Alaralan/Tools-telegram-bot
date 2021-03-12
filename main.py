@@ -26,7 +26,11 @@ from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler,
 													MessageHandler, Filters, ConversationHandler)
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 """ Download MP3 from youtube"""
-import youtube_dl
+try: 
+	import youtube_dl
+	youtube_dl_ok=True
+except ImportError:
+	youtube_dl_ok=False
 #▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 from pprint import pprint
 # pprint(update.to_dict())
@@ -310,7 +314,8 @@ def main():
 	dp.add_handler(CommandHandler('help',		helpC))
 	dp.add_handler(CommandHandler('coin',		coin))
 
-	dp.add_handler(MessageHandler(Filters.regex(r"((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+"), you2mp3))
+	if(youtube_dl_ok):
+		dp.add_handler(MessageHandler(Filters.regex(r"((http(s)?:\/\/)?)(www\.)?((youtube\.com\/)|(youtu.be\/))[\S]+"), you2mp3))
 #__________________________________________________________________
 #│ Multimedia
 	if TOKENSONG!="None":
