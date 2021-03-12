@@ -241,12 +241,16 @@ def img_background_rm(img):
 				out.write(response.content)
 	return response.status_code
 #▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+def Sending(context, cid):
+	while(sendingStop):
+		context.bot.send_chat_action(cid, 'upload_audio') # Enviando ...
+		time.sleep(3)
 def you2mp3Thread(update,context,url,cid,mid,s):
 	''' Threading downloads'''
 	# Download
 	ydl_opts={
 		'format': 'bestaudio/best',
-		'outtmpl': '%(title)s.%(ext)s',
+		'outtmpl': TEMP+'%(title)s.%(ext)s',
 		'noplaylist' : True,
 		'continue_dl' : True,
 		'postprocessors': [{
@@ -278,10 +282,6 @@ def you2mp3Thread(update,context,url,cid,mid,s):
 	global sendingStop
 	sendingStop=False
 	s.join()
-def Sending(context, cid):
-	while(sendingStop):
-		context.bot.send_chat_action(cid, 'upload_audio') # Enviando ...
-		time.sleep(3)
 def you2mp3(update, context):
 	''' YOUTUBE TO MP3 '''
 	setLang(update)
